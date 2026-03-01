@@ -14,14 +14,30 @@
 #define GAME_LAYER  2
 #define GAME_NUM    3
 
+// rgb,SPI
+&pinctrl {
+    spi3_default: spi3_default {
+        group1 {
+            psels = <NRF_PSEL(SPIM_MOSI, 1, 15)>;
+        };
+    };
 
-&spi1 {
+    spi3_sleep: spi3_sleep {
+        group1 {
+            psels = <NRF_PSEL(SPIM_MOSI, 1, 15)>;
+            low-power-enable;
+		};
+	};
+};
+
+&spi3 {
 	compatible = "nordic,nrf-spim";
 	status = "okay";
-	mosi-pin = <8>;
-	// Unused pins, needed for SPI definition, but not used by the ws2812 driver itself.
-	sck-pin = <5>;
-	miso-pin = <7>;
+
+	pinctrl-0 = <&spi3_default>;
+	pinctrl-1 = <&spi3_sleep>;
+	pinctrl-names = "default", "sleep";
+
 
 	led_strip: ws2812@0 {
 		compatible = "worldsemi,ws2812-spi";
@@ -32,7 +48,7 @@
 		spi-max-frequency = <4000000>;
 
 		/* WS2812 */
-		chain-length = <15>; /* arbitrary; change at will */
+		chain-length = <10>;
 		spi-one-frame = <0x70>;
 		spi-zero-frame = <0x40>;
 		color-mapping = <LED_COLOR_ID_GREEN LED_COLOR_ID_RED LED_COLOR_ID_BLUE>;
